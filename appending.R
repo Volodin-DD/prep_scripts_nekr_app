@@ -4,15 +4,28 @@
 packages <- c("tidyverse", "readtext", "lubridate")
 
 # Check whethet package is installed and attach it, If not installed - download, install and then attacj it
-for (p in packages) {
-    if (p %in% installed.packages()[, 1]) {
-        library(p)
-    } else {
-        install.packages(p)
-        library(p)
-    }
+if ("tidyverse" %in% installed.packages()[, 1]) {
+  library(tidyverse)
+} else {
+  install.packages("tidyverse")
+  library(tidyverse)
 }
 
+if ("readtext" %in% installed.packages()[, 1]) {
+  library(readtext)
+} else {
+  install.packages("readtext")
+  library(readtext)
+}
+
+if ("lubridate" %in% installed.packages()[, 1]) {
+  library(lubridate)
+} else {
+  install.packages("lubridate")
+  library(lubridate)
+}
+
+setwd("~/dumps")
 # Unzip the latest week update
 zipname <- system("ls /home/user/dumps", intern = TRUE)
 zipname <- zipname[which(

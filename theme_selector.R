@@ -2,10 +2,10 @@
 
 # Attach or download and attach tidyverse
 if ("tidyverse" %in% installed.packages()[, 1]) {
-    library(tidyverse)
+  library(tidyverse)
 } else {
-    install.packages("tidyverse")
-    library(tidyverse)
+  install.packages("tidyverse")
+  library(tidyverse)
 }
 
 # Load dataframes
@@ -75,8 +75,8 @@ funds_101$language <- ifelse(
 
 # First join (899 + 101)
 funds <- left_join(funds,
-          funds_101 %>% select(id, language),
-          by = "id")
+                   funds_101 %>% select(id, language),
+                   by = "id")
 
 # Extract index and catalogue name
 funds_686$catalogue <- subfield_extractor(funds_686$var, "2")
@@ -87,8 +87,8 @@ funds_686 <- funds_686[str_detect(funds_686$catalogue, ".*rubbk.*"), ]
 
 # Second join (899+101+686)
 funds <- left_join(funds,
-          funds_686 %>% select(id, bbk),
-          by = "id")
+                   funds_686 %>% select(id, bbk),
+                   by = "id")
 
 # Extract date of documents
 funds_100$var <- str_sub(funds_100$var, 5, 12)
@@ -105,20 +105,14 @@ funds <- left_join(funds,
 # Dataframe for naming the first level of funds (main, digital, microforms, regional, rare, missing)
 ### Here should be loaded dataframe from authority file for 899$b
 fund_level_1 <- data.frame(
-  subfund = funds$subfund %>% unique(),
-  level_1 = c("main", "main", "missing", 
-              "missing", "main", "main",
-              "regional", "rare", "main",
-              "digital", "digital", "digital",
-              "main", "microform", "main",
-              "main", "missing", "missing",
-              "main", "main", "missing",
-              "missing", "main", "main",
-              "missing", "rare", "missing",
-              "missing", "missing", "missing",
-              "main", "rare", "main",
-              "missing", "main", "main"
-              )
+  subfund = c("читальный зал", "абонемент", "а", "онл", "онл-чз", "ФОД", "ох-чз", "Читальный зал",
+              "ОНЛ", "Онл", "журналы ТГ", "ЖУРНАЛЫ ТГ", "эр", "аудио", "видео", "кр", "рф",
+              "рФ", "Рф", "микроформа"),
+  level_1 = c(rep("main", 12),
+              rep("digital", 3),
+              rep("regional", 1),
+              rep("rare", 3),
+              "microform")
 )
 
 # Join first level
@@ -127,6 +121,8 @@ funds <- left_join(
   fund_level_1,
   by = "subfund"
 )
+
+funds <- funds %>% mutate(level_1 = if_else(is.na(level_1), "missing", level_1))
 
 # Define levels 2 and 3
 funds <- funds %>% mutate(level_2 = if_else(fund == "main", "books and digital", "periodicals"))
@@ -145,27 +141,21 @@ funds <- funds %>% mutate(shelf_1 = if_else(
       "26.89",
       if_else(str_sub(bbk, 1, 1) %in% c("6", "7", "8"),
               str_sub(bbk, 1, 2), str_sub(bbk, 1, 1)))) %>% mutate(theme = if_else(
-    shelf_1 == "n", bbk_1, shelf_1
-  ))
+                shelf_1 == "n", bbk_1, shelf_1
+              ))
 
 ### Here should be loaded dataframe from authority file for 899$h and 686$a
 # Dataframe of bbk indexes names
 fund_level_4 <- data.frame(
-  theme = funds$theme %>% unique(),
-  level_4 = c("fiction", "psychology", "no data", "fiction", "technology", "fiction", "universal", "economics", "no data", "no data", "no data",
-              "history", "natural science", "medicine", "education", "arts", "linguistics", "farming", "no data", "religion", "no data", "no data",
-              "no data", "general", "sports", "no data", "folklore", "no data", "no data", "law", "literary studies", "philosophy", "no data",
-              "no data", "culture", "science of science", "media", "regional geography", "no data", "no data", "no data", "sociology", "philology", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data", "no data",
-              "no data", "no data", "no data")
+  theme = c(
+    "1", "2", "26.89", "3", "4", "5", "60", "63", "65", "66", "67", "68", "80", "81", "82", "83", "84",
+    "85", "86", "87", "88", "71", "72", "74", "75", "76", "77", "78", "79", "9", "И", "Р"
+  ),
+  level_4 = c("general", "natural science", "regional geography", "technology", "farming", "medicine",
+              "sociology", "history", "economics", "politics", "law", "warfare", "philology",
+              "linguistics", "folklore", "literary studies", "fiction", "arts", "religion",
+              "philosophy", "psychology", "culture", "science of science", "education", "sports",
+              "media", "recreation", "libraries", "museums", "universal", "fiction", "fiction")
 )
 
 # Join bbk indexes
@@ -194,4 +184,4 @@ funds_leveled <- funds_leveled %>% filter(level_4 == "no data") %>%
 funds_leveled <- funds_leveled %>% distinct()
 
 # Write down resulting dataframe
-write_tsv(funds_leveled, "~/Documents/Comp_app/data/funds_leveled.csv")
+write_tsv(funds_leveled, "~/Comp_app/data/funds_leveled.csv")
