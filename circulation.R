@@ -3,8 +3,6 @@ library(readtext)
 
 setwd("~/dumps")
 
-
-
 raw <- readtext("~/dumps/2014-19-circulation.txt", encoding = "UTF-8")$text
 circulation <- str_split(raw, "\n\n")[[1]]
 rm(raw)
