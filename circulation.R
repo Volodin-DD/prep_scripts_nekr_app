@@ -1,18 +1,48 @@
-library(tidyverse)
-library(readtext)
+# Load packages
+if ("tidyverse" %in% installed.packages()[, 1]) {
+  library(tidyverse)
+} else {
+  install.packages("tidyverse")
+  library(tidyverse)
+}
+
+if ("readtext" %in% installed.packages()[, 1]) {
+  library(readtext)
+} else {
+  install.packages("readtext")
+  library(readtext)
+}
+
+if ("lubridate" %in% installed.packages()[, 1]) {
+  library(lubridate)
+} else {
+  install.packages("lubridate")
+  library(lubridate)
+}
 
 setwd("~/dumps")
 
+# Read raw string
 raw <- readtext("~/dumps/2014-19-circulation.txt", encoding = "UTF-8")$text
+
+# Split records
 circulation <- str_split(raw, "\n\n")[[1]]
 rm(raw)
 gc()
+
+# Split fields
 circulation <- lapply(circulation, function(x) {str_split(x, "\n") %>% unlist()})
 circulation <- lapply(circulation, function(x) x[-(1:2)])
+
+# ID vector
 ids <- lapply(circulation, function(x) x[1]) %>% unlist() %>% str_sub(., 5, -1)
 circulation <- lapply(circulation, function(x) x[-1])
 id_length <- lapply(circulation, length) %>% unlist()
+
+# Repeat ids
 ids <- rep(ids, id_length)
+
+# Extract fields
 fields <- lapply(circulation, function(x) {str_sub(x, 1, 3)}) %>% unlist()
 var <- lapply(circulation, function(x) {str_sub(x, 5, -1)}) %>% unlist()
 
