@@ -25,7 +25,7 @@ if ("lubridate" %in% installed.packages()[, 1]) {
   library(lubridate)
 }
 
-
+# Working directory
 setwd("~/dumps")
 # Unzip the latest full update
 zipname <- system("ls /home/user/dumps", intern = TRUE)
@@ -93,6 +93,7 @@ for (f in txt_path) {
     var = vars
   )
   rm(ids, field_names, vars)
+  gc()
   
   # Save dataframe
   write_tsv(funds_df, csv_path[which(txt_path == f)])
