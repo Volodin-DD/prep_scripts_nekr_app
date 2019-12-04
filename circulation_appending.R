@@ -1,4 +1,3 @@
-# Load packages
 if ("tidyverse" %in% installed.packages()[, 1]) {
   library(tidyverse)
 } else {
@@ -21,9 +20,15 @@ if ("lubridate" %in% installed.packages()[, 1]) {
 }
 
 setwd("~/dumps")
+txt_path <- system("ls /home/user/dumps", intern = TRUE)
+txt_path <- txt_path[which(
+  as.Date(str_sub(txt_path, 1, 10), format = "%d.%m.%Y") == max(as.Date(str_sub(txt_path, 1, 10), format = "%d.%m.%Y"), na.rm = TRUE)
+)]
+txt_path <- txt_path[str_detect(txt_path, fixed("full.txt"))][3]
+txt_path <- str_c("/home/user/dumps/", txt_path)
 
 # Read raw string
-raw <- readtext("~/dumps/2014-20191121-circulation-week.txt", encoding = "UTF-8")$text
+raw <- readtext("txt_path", encoding = "UTF-8")$text
 
 # Split records
 circulation <- str_split(raw, "\n\n")[[1]]
@@ -100,4 +105,11 @@ circulation_trimmed <- left_join(
 rm(circulation_df, id_doc, id_operation)
 gc()
 
-write_tsv(circulation_trimmed, "~/Comp_app/data/circulation.csv")
+circulation_full <- read_tsv("~/Comp_app/data/circulation.csv")
+
+circulation <- rbind(
+    circulation_full,
+    circulation_trimmed
+) %>% distinct()
+
+write_tsv(circulation, "~/Comp_app/data/circulation.csv")

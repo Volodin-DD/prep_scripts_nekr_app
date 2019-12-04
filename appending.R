@@ -40,7 +40,7 @@ txt_path <- system("ls /home/user/dumps", intern = TRUE)
 txt_path <- txt_path[which(
     as.Date(str_sub(txt_path, 1, 10), format = "%d.%m.%Y") == max(as.Date(str_sub(txt_path, 1, 10), format = "%d.%m.%Y"), na.rm = TRUE)
 )]
-txt_path <- txt_path[str_detect(txt_path, fixed("week.txt"))]
+txt_path <- txt_path[str_detect(txt_path, fixed("week.txt"))][1:2]
 txt_path <- str_c("/home/user/dumps/", txt_path)
 
 # Path to resulting csv files
