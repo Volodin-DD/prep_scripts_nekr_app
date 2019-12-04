@@ -24,11 +24,11 @@ txt_path <- system("ls /home/user/dumps", intern = TRUE)
 txt_path <- txt_path[which(
   as.Date(str_sub(txt_path, 1, 10), format = "%d.%m.%Y") == max(as.Date(str_sub(txt_path, 1, 10), format = "%d.%m.%Y"), na.rm = TRUE)
 )]
-txt_path <- txt_path[str_detect(txt_path, fixed("full.txt"))][3]
+txt_path <- txt_path[str_detect(txt_path, fixed("week.txt"))][3]
 txt_path <- str_c("/home/user/dumps/", txt_path)
 
 # Read raw string
-raw <- readtext("txt_path", encoding = "UTF-8")$text
+raw <- readtext(txt_path, encoding = "UTF-8")$text
 
 # Split records
 circulation <- str_split(raw, "\n\n")[[1]]
